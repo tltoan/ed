@@ -1,0 +1,76 @@
+body {
+  background-color: black;
+}
+.admin-shipping-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 40px;
+  border: 0.5px solid #ffffff;
+  border-radius: 8px;
+  background-image: url(../assets/confirm.jpg);
+  background-size: cover;
+  color: #ffffff;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 8px;
+  border: 0.5px solid #000;
+  border-radius: 4px;
+  font-family: Helvetica, sans-serif, Courier, monospace;
+}
+
+textarea {
+  height: 80px;
+  resize: none;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #000;
+  color: #fff;
+  border: 0.5px solid white;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.submit-button:hover {
+  background-color: #2779eb;
+}
+
+.response-message {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: bold;
+}

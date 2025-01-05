@@ -1,0 +1,27 @@
+.cancel-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.retry-button,
+.continue-button {
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.retry-button:hover {
+  background-color: #c0392b;
+}
+
+.continue-button {
+  background-color: #1a73e8;
+}
+
+.continue-button:hover {
+  background-color: #155bb5;
+}

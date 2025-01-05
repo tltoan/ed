@@ -1,0 +1,65 @@
+/* Header.css */
+.header {
+  text-align: center;
+  padding: 20px;
+  background-color: black;
+}
+.header img {
+  width: 75%;
+}
+
+.header-title {
+  font-family: "Georgia", serif; /* Elegant font */
+  font-size: 3rem; /* Large title */
+  font-weight: bold;
+  color: #333; /* Dark text color */
+  margin: 0;
+}
+
+.header-subtitle {
+  font-family: "Arial", sans-serif; /* Simple font for subtitle */
+  font-size: 1.5rem; /* Smaller subtitle */
+  color: #000000; /* Slightly lighter text color */
+  margin: 5px 0 0 0;
+}
+
+.record-player:hover {
+  transform: scale(1.05); /* Slight zoom on hover */
+  animation: spin 2s linear infinite;
+}
+
+.record-player {
+  max-width: 25%;
+  cursor: pointer; /* Indicate it's clickable */
+  transition: transform 0.3s ease; /* Smooth transition when stopping */
+}
+.record-player img {
+  width: 25%;
+}
+
+.record-player.spinning {
+  animation: spin 2s linear infinite; /* Spinning animation */
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .header img {
+    width: 105%;
+  }
+  .record-player {
+    max-width: 50%;
+    cursor: pointer; /* Indicate it's clickable */
+    transition: transform 0.3s ease; /* Smooth transition when stopping */
+  }
+  .record-player img {
+    width: 50%;
+  }
+}
