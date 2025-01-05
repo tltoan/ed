@@ -1,0 +1,44 @@
+.loading-checkout-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: black;
+  color: white;
+}
+
+.loading-checkout-gif {
+  width: 100vh;
+  height: auto;
+}
+
+.loading-checkout-text {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.loading-checkout-bar {
+  width: 50%;
+  height: 10px;
+  background-color: gray;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.loading-checkout-progress {
+  width: 0;
+  height: 100%;
+  background-color: white;
+  animation: loading-progress 3s ease-in-out forwards;
+}
+
+@keyframes loading-progress {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}

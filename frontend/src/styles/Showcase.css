@@ -43,8 +43,9 @@
   z-index: 1000;
 }
 .expanded-content {
+  background-image: url(../assets/texture.jpg);
+  background-size: contain;
   position: relative; /* Needed for close-icon positioning */
-  background: white;
   padding: 20px;
   border-radius: 10px;
   text-align: center;

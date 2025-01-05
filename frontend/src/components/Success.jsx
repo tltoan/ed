@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from "react";
+import deliveries from "../assets/delieries.gif";
 import styles from "../styles/Success.module.css";
-import sold from "../assets/sold.png"; // Ensure you have the sold image in the correct path
+import sold from "../assets/sold.png";
 import { Link, useSearchParams } from "react-router-dom";
+import LoadingAfterCheckout from "./Delivery"; // Import the loading screen component
 
 const Success = () => {
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isScreenLoading, setIsScreenLoading] = useState(true); // For initial loading screen
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
 
+  // Initial loading screen effect
+  useEffect(() => {
+    const timer = setTimeout(() => setIsScreenLoading(false), 3000); // 3-second loading screen
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Fetch order details after loading screen is done
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
@@ -33,8 +43,17 @@ const Success = () => {
     }
   }, [sessionId]);
 
+  if (isScreenLoading) {
+    return <LoadingAfterCheckout />; // Show the initial loading screen
+  }
+
   if (loading) {
-    return <div className={styles.loading}>Loading order details...</div>;
+    return (
+      <div className={styles.loadingOverlay}>
+        <img src={deliveries} alt="Loading..." className={styles.loadingGif} />
+        <p className={styles.loadingText}>Loading your order details...</p>
+      </div>
+    );
   }
 
   if (error) {
