@@ -17,7 +17,9 @@ const Showcase = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get("http://localhost:52525/api/items");
+      const response = await axios.get(
+        "https://ainzpop-backend.herokuapp.com/api/items"
+      );
       setItems(response.data);
       console.log("Updated items fetched:", response.data);
     } catch (error) {

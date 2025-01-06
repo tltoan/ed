@@ -27,11 +27,14 @@ const MakeOffer = ({ item, onClose }) => {
     console.log("Offer Data Being Sent:", offerData);
     // Make the fetch request to send the offer
     try {
-      const response = await fetch("http://localhost:52525/api/send-offer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(offerData),
-      });
+      const response = await fetch(
+        "https://ainzpop-backend.herokuapp.com/api/send-offer",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(offerData),
+        }
+      );
 
       const result = await response.json();
       if (result.success) {

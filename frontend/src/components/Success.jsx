@@ -24,7 +24,7 @@ const Success = () => {
     const fetchOrderDetails = async () => {
       try {
         const response = await fetch(
-          `http://localhost:52525/api/get-order-details?session_id=${sessionId}`
+          `https://ainzpop-backend.herokuapp.com/api/get-order-details?session_id=${sessionId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch order details");

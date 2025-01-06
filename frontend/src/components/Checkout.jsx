@@ -6,7 +6,7 @@ const CheckoutButton = ({ cartItems }) => {
     try {
       console.log("Items being sent to server:", cartItems); // Log the cart items
       const response = await fetch(
-        "http://localhost:52525/api/create-checkout-session",
+        "https://ainzpop-backend.herokuapp.com/api/create-checkout-session",
         {
           method: "POST",
           headers: {
