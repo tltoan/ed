@@ -110,6 +110,7 @@ const Success = () => {
               <p>
                 Address:{" "}
                 <span>
+                  {orderDetails.shippingAddress.name},{" "}
                   {orderDetails.shippingAddress.line1},{" "}
                   {orderDetails.shippingAddress.city},{" "}
                   {orderDetails.shippingAddress.state}{" "}

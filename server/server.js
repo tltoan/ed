@@ -95,62 +95,101 @@ app.post(
             );
           }
         }
-
         setTimeout(
           async () => {
             try {
+              const session = await stripe.checkout.sessions.retrieve(
+                event.data.object.id,
+                { expand: ["shipping_details"] }
+              );
+
               const orderNumber = session.id.slice(-8);
-              const shippingAddress =
-                session.shipping && session.shipping.address
-                  ? {
-                      line1: session.shipping.address.line1 || "N/A",
-                      city: session.shipping.address.city || "N/A",
-                      state: session.shipping.address.state || "N/A",
-                      postal_code:
-                        session.shipping.address.postal_code || "N/A",
-                      country: session.shipping.address.country || "N/A",
-                    }
-                  : {
-                      line1: "N/A",
-                      city: "N/A",
-                      state: "N/A",
-                      postal_code: "N/A",
-                      country: "N/A",
-                    };
+              const customerEmail = session.customer_details.email;
+
+              const shippingAddress = session.shipping_details
+                ? {
+                    name: session.shipping_details.name || "N/A",
+                    line1: session.shipping_details.address.line1 || "N/A",
+                    city: session.shipping_details.address.city || "N/A",
+                    state: session.shipping_details.address.state || "N/A",
+                    postal_code:
+                      session.shipping_details.address.postal_code || "N/A",
+                    country: session.shipping_details.address.country || "N/A",
+                  }
+                : {
+                    name: "N/A",
+                    line1: "N/A",
+                    city: "N/A",
+                    state: "N/A",
+                    postal_code: "N/A",
+                    country: "N/A",
+                  };
 
               const order = new Order({
-                orderNumber: session.id.slice(-8),
+                orderNumber,
                 items,
                 total: session.amount_total / 100,
                 customerEmail,
                 shippingAddress,
               });
 
+              console.log("Shipping information received:", shippingAddress);
+
               await order.save();
               console.log("Order saved successfully:", order);
 
-              // Proceed with sending the email
               await transporter.sendMail({
                 from: `"AINZTAV" <${process.env.EMAIL_USER}>`,
                 to: customerEmail,
-                subject: "Your Order is Confirmed",
+                subject: `Thank you for your order! (#${orderNumber})`,
                 html: `
-                <h2>Thank you for your order!</h2>
-                <p>Please give me 2-3 weeks to ship it out (18 credits this semester).</p>
-                <p><strong>Order No:</strong> ${orderNumber}</p>
-                ${shippingAddress}
-                <p><strong>Items:</strong></p>
-                <ul>
-                  ${items
-                    .map(
-                      (item) =>
-                        `<li>${item.name} - Quantity: ${item.quantity}</li>`
-                    )
-                    .join("")}
-                </ul>
-                <p>If you have any questions, please contact our support at antonyltran@gmail.com.</p>
-              `,
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+                    <h2 style="text-align: center; color: #333;">Thank you for your order!</h2>
+                    <p style="text-align: center; color: #555;">Your order is confirmed and will be shipped soon.</p>
+                    <div style="margin-top: 20px; padding: 15px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+                      <div style="margin-bottom: 10px;">
+                        <h3 style="margin: 0; text-align: center;">Order No:</h3>
+                        <h4 style="margin: 0; text-align: center; font-weight: normal;">${orderNumber}</h4>
+                      </div>
+                      <div style="margin-bottom: 10px;">
+                        <h3 style="margin: 0; text-align: center;">Order Date:</h3>
+                        <h4 style="margin: 0; text-align: center; font-weight: normal;">${new Date(order.createdAt).toLocaleDateString()}</h4>
+                      </div>
+                      <div style="margin-bottom: 10px;">
+                        <h3 style="margin: 0; text-align: center;">Shipping Address:</h3>
+                        <h4 style="margin: 0; text-align: center; font-weight: normal;">
+                          ${shippingAddress.name}<br>
+                          ${shippingAddress.line1}, ${shippingAddress.city}, ${shippingAddress.state}<br>
+                          ${shippingAddress.postal_code}, ${shippingAddress.country}
+                        </h4>
+                    </div>
+                    <h3 style="margin-top: 20px; text-align: center;">Items Ordered:</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 10px;">
+                        ${items
+                          .map(
+                            (item) => `
+                              <div style="width: 30%; text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 10px;">
+                                <img src="${item.image}" alt="${item.name}" style="max-width: 100%; height: auto; border-radius: 5px;">
+                                <h4 style="margin: 10px 0 5px;">${item.name}</h4>
+                              </div>
+                            `
+                          )
+                          .join("")}
+                      </div>
+                    </div>
+                    
+                    <p style="margin-top: 20px; text-align: center;">If you have any questions, please contact our support at <a href="mailto:antonytran@gmail.com">antonytran@gmail.com</a>.</p>
+                    
+                    <div style="margin-top: 30px; text-align: center;">
+                      <img src="https://res.cloudinary.com/dy2bzdqdk/image/upload/delieries_fnse2i.gif" alt="WE OTW!" style="max-width: 100%; height: auto; border-radius: 5px;">
+                      <h1>WE OTW!</h1>
+                    </div>
+                    
+                    <p style="margin-top: 20px; text-align: center; color: #999;">&copy; ${new Date().getFullYear()} AINZTAV. All rights reserved.</p>
+                  </div>
+                `,
               });
+
               console.log(
                 "Shipping confirmation email sent to:",
                 customerEmail
@@ -337,23 +376,29 @@ app.post("/api/create-checkout-session", async (req, res) => {
         quantity: item.quantity,
       })),
       shipping_address_collection: {
-        allowed_countries: ["US"], // Only allow US shipping
+        allowed_countries: ["US"], // Ensure this is set
       },
       mode: "payment",
+      tax_id_collection: {
+        enabled: true, // Collects tax information for compliance
+      },
+      automatic_tax: {
+        enabled: true, // Automatically calculates the tax based on customer's location
+      },
       metadata: {
         items: JSON.stringify(
           items.map(({ id, name, quantity, stock, checkout }) => ({
             id,
             name,
             quantity,
-            stock, // Include stock for decrementing in webhook
+            stock,
             image: checkout ? checkout[0] : "",
           }))
         ),
       },
       success_url:
-        "http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}", // Redirect to success route
-      cancel_url: "http://localhost:3000/cancel", // Redirect to cancel route
+        "http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: "http://localhost:3000/cancel",
     });
 
     res.status(200).json({ url: session.url });
@@ -428,7 +473,7 @@ app.post("/api/confirm-shipping", async (req, res) => {
     }
 
     // Fetch the real order from the database
-    const order = await Order.findOne({ orderId }); // Ensure 'Order' is your actual model
+    const order = await Order.findOne({ orderNumber: orderId });
 
     if (!order) {
       return res.status(404).json({ error: "Order not found." });
@@ -437,19 +482,51 @@ app.post("/api/confirm-shipping", async (req, res) => {
     // Send shipping confirmation email
     const mailOptions = {
       from: `"AINZTAV" <${process.env.EMAIL_USER}>`,
-      to: order.email,
+      to: order.customerEmail,
       subject: `Shipping Confirmation for Order #${orderId}`,
       html: `
-        <h2>Your order has been shipped!</h2>
-        <p><strong>Order ID:</strong> ${orderId}</p>
-        <p><strong>Tracking Number:</strong> ${trackingNumber}</p>
-        ${
-          providerLink
-            ? `<p>Track your shipment <a href="${providerLink}">here</a>.</p>`
-            : ""
-        }
-        ${customMessage ? `<p>Note from the seller: ${customMessage}</p>` : ""}
-        <p>Thank you for shopping with us!</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+          <h2 style="text-align: center; color: #333;">Your order has been shipped!</h2>
+          <p style="text-align: center; color: #555;">We are pleased to inform you that your order is on its way.</p>
+          
+          <div style="margin-top: 20px; padding: 15px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+            <div style="margin-bottom: 10px;">
+              <h3 style="margin: 0; text-align: center;">Order ID:</h3>
+              <h4 style="margin: 0; text-align: center; font-weight: normal;">${orderId}</h4>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <h3 style="margin: 0; text-align: center;">Tracking Number:</h3>
+              <h4 style="margin: 0; text-align: center; font-weight: normal;">${trackingNumber}</h4>
+            </div>
+            ${
+              providerLink
+                ? `<div style="margin-bottom: 10px;">
+                    <h3 style="margin: 0; text-align: center;">Track Your Shipment:</h3>
+                    <h4 style="margin: 0; text-align: center; font-weight: normal;">
+                      <a href="${providerLink}" style="color: #1a73e8;">Click here to track your shipment</a>
+                    </h4>
+                  </div>`
+                : ""
+            }
+            ${
+              customMessage
+                ? `<div style="margin-bottom: 10px;">
+                    <h3 style="margin: 0; text-align: center;">Note from the Seller:</h3>
+                    <h4 style="margin: 0; text-align: center; font-weight: normal;">${customMessage}</h4>
+                  </div>`
+                : ""
+            }
+          </div>
+          
+          <p style="margin-top: 20px; text-align: center;">Thank you for shopping with us!</p>
+          
+          <div style="margin-top: 30px; text-align: center;">
+            <img src="https://res.cloudinary.com/dy2bzdqdk/image/upload/sisyphus_fbnuyu.gif" alt="WE OTW!" style="max-width: 100%; height: auto; border-radius: 5px;">
+            <h1>Just a little more!</h1>
+          </div>
+          
+          <p style="margin-top: 20px; text-align: center; color: #999;">&copy; ${new Date().getFullYear()} AINZTAV. All rights reserved.</p>
+        </div>
       `,
     };
 
