@@ -104,6 +104,21 @@ const Success = () => {
           <p className={`${styles.total} special-font`}>
             Total: <span>${orderDetails.total}</span>
           </p>
+          {orderDetails.shippingAddress && (
+            <div className={`${styles.shippingInfo} special-font`}>
+              <h2>Shipping Information</h2>
+              <p>
+                Address:{" "}
+                <span>
+                  {orderDetails.shippingAddress.line1},{" "}
+                  {orderDetails.shippingAddress.city},{" "}
+                  {orderDetails.shippingAddress.state}{" "}
+                  {orderDetails.shippingAddress.postal_code},{" "}
+                  {orderDetails.shippingAddress.country}
+                </span>
+              </p>
+            </div>
+          )}
         </div>
         <Link to="/" className={`${styles.homeLink} special-font`}>
           Go back to homepage
