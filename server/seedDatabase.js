@@ -2,10 +2,13 @@ const mongoose = require("mongoose");
 const Item = require("./models/Item.js"); // Adjust the path to your Item model
 const items = require("./data/items.js"); // Adjust the path to your items.js file
 
-mongoose.connect("mongodb://localhost:27017/clothingShowcase", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 const seedDatabase = async () => {
   for (const item of items) {

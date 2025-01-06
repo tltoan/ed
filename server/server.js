@@ -29,7 +29,10 @@ const validateEnv = () => {
 };
 
 mongoose
-  .connect("mongodb://localhost:27017/clothingShowcase")
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
@@ -164,7 +167,7 @@ app.post(
                         </h4>
                     </div>
                     <h3 style="margin-top: 20px; text-align: center;">Items Ordered:</h3>
-                    <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 10px;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 10px; align-items: center;">
                         ${items
                           .map(
                             (item) => `
@@ -241,7 +244,7 @@ if (
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // Allow requests from this front-end origin
+    origin: "https://ainztav.com/ainzpop", // Allow requests from this front-end origin
     methods: ["GET", "POST"], // Specify allowed HTTP methods
     allowedHeaders: ["Content-Type"], // Specify allowed headers
   })
@@ -325,7 +328,7 @@ app.post(
     try {
       await transporter.sendMail({
         from: `"New Offer AntonyPop" <${process.env.EMAIL_USER}>`,
-        to: "t.ainz2005@gmail.com",
+        to: "a.inzzztav@gmail.com",
         subject: `New Offer for ${item.name}`,
         html: `
           <h3>New Offer Received</h3>
@@ -397,8 +400,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
         ),
       },
       success_url:
-        "http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: "http://localhost:3000/cancel",
+        "https://ainztav.com/ainzpop/success?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: "https://ainztav.com/ainzpop/cancel",
     });
 
     res.status(200).json({ url: session.url });
