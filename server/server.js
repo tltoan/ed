@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const Item = require("./models/Item");
+const Order = require("./models/order");
 const nodemailer = require("nodemailer");
 const { body, validationResult } = require("express-validator");
 const cors = require("cors");
@@ -73,6 +74,13 @@ app.post(
         console.log("Parsed items:", items);
         console.log("Customer email:", customerEmail);
 
+        // Check if shipping information is available
+        if (session.shipping) {
+          console.log("Shipping Address:", session.shipping.address);
+        } else {
+          console.log("No shipping address provided.");
+        }
+
         for (const item of items) {
           console.log("Updating stock for item:", item.id);
           const updateResult = await Item.updateOne(
@@ -92,14 +100,45 @@ app.post(
           async () => {
             try {
               const orderNumber = session.id.slice(-8);
+              const shippingAddress =
+                session.shipping && session.shipping.address
+                  ? {
+                      line1: session.shipping.address.line1 || "N/A",
+                      city: session.shipping.address.city || "N/A",
+                      state: session.shipping.address.state || "N/A",
+                      postal_code:
+                        session.shipping.address.postal_code || "N/A",
+                      country: session.shipping.address.country || "N/A",
+                    }
+                  : {
+                      line1: "N/A",
+                      city: "N/A",
+                      state: "N/A",
+                      postal_code: "N/A",
+                      country: "N/A",
+                    };
+
+              const order = new Order({
+                orderNumber: session.id.slice(-8),
+                items,
+                total: session.amount_total / 100,
+                customerEmail,
+                shippingAddress,
+              });
+
+              await order.save();
+              console.log("Order saved successfully:", order);
+
+              // Proceed with sending the email
               await transporter.sendMail({
-                from: `"Your Store Name" <${process.env.EMAIL_USER}>`,
+                from: `"AINZTAV" <${process.env.EMAIL_USER}>`,
                 to: customerEmail,
-                subject: "Your Order Has Shipped!",
+                subject: "Your Order is Confirmed",
                 html: `
                 <h2>Thank you for your order!</h2>
-                <p>Your order has been shipped and is on its way.</p>
-                <p>Order No: ${orderNumber}</p>
+                <p>Please give me 2-3 weeks to ship it out (18 credits this semester).</p>
+                <p><strong>Order No:</strong> ${orderNumber}</p>
+                ${shippingAddress}
                 <p><strong>Items:</strong></p>
                 <ul>
                   ${items
@@ -109,7 +148,7 @@ app.post(
                     )
                     .join("")}
                 </ul>
-                <p>If you have any questions, please contact our support at support@example.com.</p>
+                <p>If you have any questions, please contact our support at antonyltran@gmail.com.</p>
               `,
               });
               console.log(
@@ -208,6 +247,18 @@ app.get("/api/items", async (req, res) => {
   } catch (err) {
     console.error("Error fetching items:", err);
     res.status(500).send("Error fetching items");
+  }
+});
+
+// GET Route for Orders
+
+app.get("/api/orders", async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ orderDate: -1 }); // Fetch all orders, sorted by date
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -366,14 +417,6 @@ app.get("/api/get-order-details", async (req, res) => {
   }
 });
 
-const mockOrders = [
-  {
-    orderId: "ABCDEFGH",
-    email: "customer@example.com",
-    date: "1/5/2025",
-  },
-];
-
 app.post("/api/confirm-shipping", async (req, res) => {
   try {
     const { orderId, trackingNumber, providerLink, customMessage } = req.body;
@@ -384,18 +427,16 @@ app.post("/api/confirm-shipping", async (req, res) => {
         .json({ error: "Order ID and tracking number are required." });
     }
 
-    // Simulate fetching the order from the database
-    const order = mockOrders.find((o) => o.orderId === orderId);
+    // Fetch the real order from the database
+    const order = await Order.findOne({ orderId }); // Ensure 'Order' is your actual model
 
     if (!order) {
       return res.status(404).json({ error: "Order not found." });
     }
 
-    console.log("Email sent to:", order.email);
-
     // Send shipping confirmation email
     const mailOptions = {
-      from: "t.ainz2005@gmail.com",
+      from: `"AINZTAV" <${process.env.EMAIL_USER}>`,
       to: order.email,
       subject: `Shipping Confirmation for Order #${orderId}`,
       html: `

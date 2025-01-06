@@ -3,10 +3,11 @@ import "../styles/Header.css";
 import logo from "../assets/antony-pop.svg";
 import recordPlayer from "../assets/record.svg";
 import tune from "../assets/september-mix.mp3";
+import tune02 from "../assets/deep-house.mp3";
 
 const Header = () => {
   const [isPlaying, setIsPlaying] = useState(true); // Set initial state to true
-  const audioRef = useRef(new Audio(tune));
+  const audioRef = useRef(new Audio(tune02));
 
   useEffect(() => {
     audioRef.current.play().catch((err) => {

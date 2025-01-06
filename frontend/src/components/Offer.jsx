@@ -53,7 +53,7 @@ const MakeOffer = ({ item, onClose }) => {
         <button className="modal-close" onClick={onClose}>
           &times;
         </button>
-        <h2>
+        <h2 className="special-font">
           Make an Offer for {item?.name || "Unknown Item"} (ID:{" "}
           {item?.id || "N/A"})
         </h2>

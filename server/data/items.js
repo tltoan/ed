@@ -3,7 +3,7 @@ const items = [
     id: "BBJKT",
     images: [
       "/clothes-img/baseball1.svg",
-      "/clothes-img/basbeball2.svg",
+      "/clothes-img/baseball2.svg",
       "/clothes-img/baseball3.svg",
     ],
     name: "Blue Baseball Jacket",
