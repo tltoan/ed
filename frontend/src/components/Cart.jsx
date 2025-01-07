@@ -27,8 +27,9 @@ const Cart = () => {
       return;
     }
     try {
+      console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
       const response = await fetch(
-        "https://ainzpop-backend.herokuapp.com/api/create-checkout-session",
+        `${process.env.REACT_APP_BACKEND_URL}/api/create-checkout-session`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

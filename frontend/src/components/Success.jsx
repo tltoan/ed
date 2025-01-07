@@ -23,8 +23,9 @@ const Success = () => {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
+        console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
         const response = await fetch(
-          `https://ainzpop-backend.herokuapp.com/api/get-order-details?session_id=${sessionId}`
+          `${process.env.REACT_APP_BACKEND_URL}/api/get-order-details?session_id=${sessionId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch order details");

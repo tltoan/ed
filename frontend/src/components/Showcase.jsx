@@ -17,8 +17,9 @@ const Showcase = () => {
 
   const fetchItems = async () => {
     try {
+      console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
       const response = await axios.get(
-        "https://ainzpop-backend.herokuapp.com/api/items"
+        `${process.env.REACT_APP_BACKEND_URL}/api/items`
       );
       setItems(response.data);
       console.log("Updated items fetched:", response.data);
@@ -29,6 +30,7 @@ const Showcase = () => {
 
   useEffect(() => {
     fetchItems();
+    console.log("Fetching items...");
   }, []);
 
   const handleAddToCart = (item) => {

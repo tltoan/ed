@@ -28,7 +28,7 @@ const MakeOffer = ({ item, onClose }) => {
     // Make the fetch request to send the offer
     try {
       const response = await fetch(
-        "https://ainzpop-backend.herokuapp.com/api/send-offer",
+        `${process.env.REACT_APP_BACKEND_URL}/api/send-offer`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

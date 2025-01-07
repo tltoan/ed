@@ -4,9 +4,10 @@ import "../styles/Checkout.css";
 const CheckoutButton = ({ cartItems }) => {
   const handleCheckout = async () => {
     try {
+      console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
       console.log("Items being sent to server:", cartItems); // Log the cart items
       const response = await fetch(
-        "https://ainzpop-backend.herokuapp.com/api/create-checkout-session",
+        `${process.env.REACT_APP_BACKEND_URL}/api/create-checkout-session`,
         {
           method: "POST",
           headers: {

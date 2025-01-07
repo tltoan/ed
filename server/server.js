@@ -244,7 +244,7 @@ if (
 
 app.use(
   cors({
-    origin: "https://ainztav.com/ainzpop", // Allow requests from this front-end origin
+    origin: "https://ainztav.com", // Allow requests from this front-end origin
     methods: ["GET", "POST"], // Specify allowed HTTP methods
     allowedHeaders: ["Content-Type"], // Specify allowed headers
   })

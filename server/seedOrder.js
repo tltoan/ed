@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Order = require("../server/models/order"); // Assuming 'Order' is in './models'
+const Order = require("./models/order"); // Assuming 'Order' is in './models'
 
 mongoose
   .connect(process.env.MONGO_URI, {

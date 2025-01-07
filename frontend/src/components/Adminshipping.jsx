@@ -12,8 +12,9 @@ const AdminShipping = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
       const res = await axios.post(
-        "http://localhost:52525/api/confirm-shipping",
+        `${process.env.REACT_APP_BACKEND_URL}/api/confirm-shipping`,
         {
           orderId,
           trackingNumber,
