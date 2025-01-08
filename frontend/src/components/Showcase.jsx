@@ -1,4 +1,3 @@
-// Showcase.jsx - Updated to pass metadata
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CheckoutButton from "./Checkout";
@@ -12,7 +11,6 @@ const Showcase = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [expandedItem, setExpandedItem] = useState(null);
   const [currentPopupIndex, setCurrentPopupIndex] = useState(0);
-
   const [items, setItems] = useState([]);
 
   const fetchItems = async () => {
@@ -95,20 +93,6 @@ const Showcase = () => {
       }
     }
   };
-
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const response = await axios.get("http://localhost:52525/api/items");
-        console.log("Fetched items:", response.data);
-        setItems(response.data);
-      } catch (error) {
-        console.error("Error fetching items:", error);
-      }
-    };
-
-    fetchItems();
-  }, []);
 
   const handleClose = () => {
     setExpandedItem(null);
