@@ -242,12 +242,6 @@ app.get("/api/ainzpop", (req, res) => {
   res.send("This is the /ainzpop endpoint");
 });
 
-// 404 Fallback Middleware
-app.use((req, res, next) => {
-  console.log(`Incoming request: ${req.method} ${req.url}`);
-  res.status(404).send("Route not found");
-});
-
 // Validate Environment Variables
 if (
   !process.env.EMAIL_USER ||
@@ -561,6 +555,12 @@ app.post("/api/confirm-shipping", async (req, res) => {
 
 app.get("/api/ping", (req, res) => {
   res.status(200).json({ message: "Pong!" });
+});
+
+// 404 Fallback Middleware
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  res.status(404).send("Route not found");
 });
 
 // Start Server
