@@ -7,9 +7,9 @@ const nodemailer = require("nodemailer");
 const { body, validationResult } = require("express-validator");
 const cors = require("cors");
 const Stripe = require("stripe"); // Import Stripe
-require("dotenv-safe").config({
-  example: "./.env.example",
-});
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv-safe").config();
+}
 
 console.log("Loaded Webhook Secret:", process.env.STRIPE_WEBHOOK_SECRET);
 
@@ -50,7 +50,9 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 
-const PORT = 52525;
+app.use(cors());
+
+const PORT = process.env.PORT || 3000;
 
 app.use("/webhook", express.raw({ type: "application/json" }));
 
@@ -230,6 +232,17 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Root Route
+app.get("/", (req, res) => {
+  res.send("Hello from Ainzpop Backend");
+});
+
+// 404 Fallback Middleware
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  res.status(404).send("Route not found");
+});
+
 // Validate Environment Variables
 if (
   !process.env.EMAIL_USER ||
@@ -242,13 +255,15 @@ if (
   process.exit(1);
 }
 
-app.use(
-  cors({
-    origin: "https://ainztav.com", // Allow requests from this front-end origin
-    methods: ["GET", "POST"], // Specify allowed HTTP methods
-    allowedHeaders: ["Content-Type"], // Specify allowed headers
-  })
-);
+app.get("/api/test-connection", async (req, res) => {
+  try {
+    const items = await Item.find({});
+    res.status(200).json({ success: true, items });
+  } catch (error) {
+    console.error("Error fetching test items:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 app.post("/api/test-update-stock", async (req, res) => {
   try {
@@ -272,12 +287,6 @@ app.post("/api/test-update-stock", async (req, res) => {
     console.error("Error updating stock:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-});
-
-// Root Route
-app.get("/", (req, res) => {
-  console.log("Root route accessed!");
-  res.send("Welcome to the BACKROOM HOES");
 });
 
 // GET Route for Items
@@ -542,6 +551,10 @@ app.post("/api/confirm-shipping", async (req, res) => {
     console.error("Error confirming shipping:", error);
     res.status(500).json({ error: "Internal server error." });
   }
+});
+
+app.get("/api/ping", (req, res) => {
+  res.status(200).json({ message: "Pong!" });
 });
 
 // Start Server
