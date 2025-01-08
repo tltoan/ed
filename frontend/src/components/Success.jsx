@@ -1,133 +1,194 @@
-import React, { useEffect, useState } from "react";
-import deliveries from "../assets/delieries.gif";
-import styles from "../styles/Success.module.css";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import CheckoutButton from "./Checkout";
+import Offer from "./Offer";
+import "../styles/Showcase.css";
+import { useCart } from "../components/CartContext";
 import sold from "../assets/sold.png";
-import { Link, useSearchParams } from "react-router-dom";
-import LoadingAfterCheckout from "./Delivery"; // Import the loading screen component
 
-const Success = () => {
-  const [orderDetails, setOrderDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isScreenLoading, setIsScreenLoading] = useState(true); // For initial loading screen
-  const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get("session_id");
+const Showcase = () => {
+  const { addToCart, cartItems } = useCart();
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [expandedItem, setExpandedItem] = useState(null);
+  const [currentPopupIndex, setCurrentPopupIndex] = useState(0);
+  const [items, setItems] = useState([]);
 
-  // Initial loading screen effect
+  const fetchItems = async () => {
+    try {
+      console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/items`
+      );
+      setItems(response.data);
+      console.log("Updated items fetched:", response.data);
+    } catch (error) {
+      console.error("Error fetching items:", error);
+    }
+  };
+
   useEffect(() => {
-    const timer = setTimeout(() => setIsScreenLoading(false), 3000); // 3-second loading screen
-    return () => clearTimeout(timer);
+    fetchItems();
+    console.log("Fetching items...");
   }, []);
 
-  // Fetch order details after loading screen is done
-  useEffect(() => {
-    const fetchOrderDetails = async () => {
-      try {
-        console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
-        const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/get-order-details?session_id=${sessionId}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch order details");
-        }
-        const data = await response.json();
-        setOrderDetails(data);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-
-    if (sessionId) {
-      fetchOrderDetails();
+  const handleAddToCart = (item) => {
+    if (cartItems.find((cartItem) => cartItem.id === item.id)) {
+      alert(`${item.name} is already in your cart.`);
+      return;
     }
-  }, [sessionId]);
 
-  if (isScreenLoading) {
-    return <LoadingAfterCheckout />; // Show the initial loading screen
-  }
+    if (item.stock > 0) {
+      addToCart({ ...item, quantity: 1 });
+    } else {
+      alert(`${item.name} is out of stock.`);
+    }
+  };
 
-  if (loading) {
-    return (
-      <div className={styles.loadingOverlay}>
-        <img src={deliveries} alt="Loading..." className={styles.loadingGif} />
-        <p className={styles.loadingText}>Loading your order details...</p>
-      </div>
-    );
-  }
+  const handleItemClick = (item) => {
+    setExpandedItem(item);
+    setCurrentPopupIndex(0);
+  };
 
-  if (error) {
-    return <div className={styles.error}>Error: {error}</div>;
-  }
+  const handleNextImage = () => {
+    if (expandedItem) {
+      setCurrentPopupIndex(
+        (prevIndex) => (prevIndex + 1) % expandedItem.popupImages.length
+      );
+    }
+  };
+
+  const handlePreviousImage = () => {
+    if (expandedItem) {
+      setCurrentPopupIndex((prevIndex) =>
+        prevIndex === 0 ? expandedItem.popupImages.length - 1 : prevIndex - 1
+      );
+    }
+  };
+
+  const handleMouseEnter = (e, images) => {
+    const imgElement = e.currentTarget.querySelector("img");
+    let currentIndex = 0;
+
+    const intervalId = setInterval(() => {
+      currentIndex = (currentIndex + 1) % images.length;
+      imgElement.src = images[currentIndex];
+    }, 1000);
+
+    e.currentTarget.setAttribute("data-interval-id", intervalId);
+  };
+
+  const handleMouseLeave = (e) => {
+    const intervalId = e.currentTarget.getAttribute("data-interval-id");
+    if (intervalId) {
+      clearInterval(intervalId);
+      e.currentTarget.removeAttribute("data-interval-id");
+
+      const imgElement = e.currentTarget.querySelector("img");
+      const item = items.find((item) => item.images.includes(imgElement.src));
+
+      if (item && item.images && item.images.length > 0) {
+        imgElement.src = item.images[0];
+      } else {
+        console.error("Item or images not found for reset.");
+      }
+    }
+  };
+
+  const handleClose = () => {
+    setExpandedItem(null);
+  };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.receipt}>
-        <h1 className={`${styles.thankYou} special-font`}>
-          Thank You for Your Purchase!
-        </h1>
-        <p className={styles.orderInfo}>
-          Order No: <span>{orderDetails.id.slice(-8)}</span>
-        </p>
-        <p className={`${styles.orderInfo} special-font`}>
-          Date: <span>{new Date(orderDetails.date).toLocaleDateString()}</span>
-        </p>
-        <div className={styles.items}>
-          {orderDetails.items.map((item, index) => (
-            <div key={index} className={styles.item}>
-              <div className={styles.imageContainer}>
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className={styles.itemImage}
-                />
-                <img src={sold} alt="Sold" className={styles.soldOverlay} />
+    <div>
+      <div className="showcase">
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className={`para showcase-item ${item.stock === 0 ? "sold" : ""}`}
+            onClick={() => handleItemClick(item)}
+            onMouseEnter={(e) => handleMouseEnter(e, item.images)}
+            onMouseLeave={handleMouseLeave}>
+            <img
+              src={
+                item.images && item.images.length > 0
+                  ? item.images[0]
+                  : "fallback-image-url"
+              }
+              alt={item.name}
+              className="item-image"
+            />
+            {item.stock === 0 && (
+              <div className="sold-overlay">
+                <img src={sold} alt="Sold" className="sold-sign" />
               </div>
-              <div className={`${styles.itemDetails} special-font`}>
-                <h2>{item.name}</h2>
-                <p>Quantity: {item.quantity}</p>
-                <p>Price: ${item.price / 100}</p>
-              </div>
+            )}
+            <h3 className="special-font">{item.name}</h3>
+            <p>{item.brand}</p>
+            <p>{item.size}</p>
+            <p>{item.cost}</p>
+            {item.stock === 0 ? (
+              <button className="disabled-button" disabled>
+                Out of Stock
+              </button>
+            ) : (
+              <button
+                className="special-font"
+                onClick={() => handleAddToCart(item)}>
+                Add to Cart
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+      {expandedItem && (
+        <div className="expanded-item">
+          <div className="expanded-content">
+            <button onClick={handleClose} className="close-icon">
+              &times;
+            </button>
+            <div className="image-container">
+              {expandedItem.popupImages &&
+              expandedItem.popupImages.length > 0 ? (
+                <>
+                  <img
+                    src={expandedItem.popupImages[currentPopupIndex]}
+                    alt={`${expandedItem.name} popup`}
+                    className="expanded-image"
+                  />
+                  <button
+                    onClick={handlePreviousImage}
+                    className="nav-button previous-button">
+                    &#8249;
+                  </button>
+                  <button
+                    onClick={handleNextImage}
+                    className="nav-button next-button">
+                    &#8250;
+                  </button>
+                </>
+              ) : (
+                <p>No popup images available</p>
+              )}
             </div>
-          ))}
-        </div>
-        <div className={`${styles.summary} special-font`}>
-          <p>
-            Subtotal: <span>${orderDetails.subtotal}</span>
-          </p>
-          <p>
-            Shipping: <span>${orderDetails.shipping}</span>
-          </p>
-          <p>
-            Tax: <span>${orderDetails.tax}</span>
-          </p>
-          <p className={`${styles.total} special-font`}>
-            Total: <span>${orderDetails.total}</span>
-          </p>
-          {orderDetails.shippingAddress && (
-            <div className={`${styles.shippingInfo} special-font`}>
-              <h2>Shipping Information</h2>
-              <p>
-                Address:{" "}
-                <span>
-                  {orderDetails.shippingAddress.name},{" "}
-                  {orderDetails.shippingAddress.line1},{" "}
-                  {orderDetails.shippingAddress.city},{" "}
-                  {orderDetails.shippingAddress.state}{" "}
-                  {orderDetails.shippingAddress.postal_code},{" "}
-                  {orderDetails.shippingAddress.country}
-                </span>
-              </p>
+            <h3>{expandedItem.name}</h3>
+            <p>{expandedItem.description}</p>
+            <div className="button-group">
+              <button
+                onClick={() => setSelectedItem(expandedItem)}
+                className="special-font make-offer-button">
+                Make Offer
+              </button>
+              <CheckoutButton cartItems={[expandedItem]} />
             </div>
+          </div>
+
+          {selectedItem && (
+            <Offer item={selectedItem} onClose={() => setSelectedItem(null)} />
           )}
         </div>
-        <Link to="/" className={`${styles.homeLink} special-font`}>
-          Go back to homepage
-        </Link>
-      </div>
+      )}
     </div>
   );
 };
 
-export default Success;
+export default Showcase;
