@@ -13,22 +13,22 @@ const Showcase = () => {
   const [currentPopupIndex, setCurrentPopupIndex] = useState(0);
   const [items, setItems] = useState([]);
 
-  const fetchItems = async () => {
-    try {
-      console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/items`
-      );
-      setItems(response.data);
-      console.log("Updated items fetched:", response.data);
-    } catch (error) {
-      console.error("Error fetching items:", error);
-    }
-  };
-
+  // Fetch items from the backend when the component mounts
   useEffect(() => {
-    fetchItems();
-    console.log("Fetching items...");
+    const fetchItems = async () => {
+      try {
+        console.log("Fetching items...");
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/items`
+        );
+        console.log("Fetched items:", response.data);
+        setItems(response.data);
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      }
+    };
+
+    fetchItems(); // Make the API call
   }, []);
 
   const handleAddToCart = (item) => {
