@@ -232,7 +232,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Root Route
+// Root route
+app.get("/", (req, res) => {
+  res.send("Welcome to the backend");
+});
+
+// API route
 app.get("/api/ainzpop", (req, res) => {
   res.send("This is the /ainzpop endpoint");
 });
@@ -293,11 +298,12 @@ app.post("/api/test-update-stock", async (req, res) => {
 
 app.get("/api/items", async (req, res) => {
   try {
-    const items = await Item.find({});
-    res.json(items);
-  } catch (err) {
-    console.error("Error fetching items:", err);
-    res.status(500).send("Error fetching items");
+    // Fetch items from the database (assuming you have a database connection)
+    const items = await Item.find({}); // Example of fetching items from a database
+    res.json(items); // Return the items as a JSON response
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    res.status(500).json({ error: "Failed to fetch items" });
   }
 });
 

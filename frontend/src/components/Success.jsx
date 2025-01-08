@@ -27,6 +27,7 @@ const Success = () => {
         const response = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/api/get-order-details?session_id=${sessionId}`
         );
+        console.log(response.data);
         if (!response.ok) {
           throw new Error("Failed to fetch order details");
         }
