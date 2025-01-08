@@ -233,8 +233,8 @@ const transporter = nodemailer.createTransport({
 });
 
 // Root Route
-app.get("/", (req, res) => {
-  res.send("Hello from Ainzpop Backend");
+app.get("/api/ainzpop", (req, res) => {
+  res.send("This is the /ainzpop endpoint");
 });
 
 // 404 Fallback Middleware
