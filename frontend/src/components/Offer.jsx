@@ -20,7 +20,7 @@ const MakeOffer = ({ item, onClose }) => {
       offer,
       message,
       item: {
-        id: item?.id,
+        id: item?._id,
         name: item?.name,
       },
     };
@@ -58,7 +58,7 @@ const MakeOffer = ({ item, onClose }) => {
         </button>
         <h2 className="special-font">
           Make an Offer for {item?.name || "Unknown Item"} (ID:{" "}
-          {item?.id || "N/A"})
+          {item?._id || "N/A"})
         </h2>
         <form onSubmit={handleSubmit}>
           <input
