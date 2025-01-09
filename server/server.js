@@ -88,16 +88,16 @@ app.post(
         }
 
         for (const item of items) {
-          console.log("Updating stock for item:", item.id);
+          console.log("Updating stock for item:", item._id);
           const updateResult = await Item.updateOne(
-            { id: item.id },
+            { id: item._id },
             { $inc: { stock: -item.quantity } }
           );
           if (updateResult.modifiedCount > 0) {
-            console.log(`Stock updated successfully for item ${item.id}`);
+            console.log(`Stock updated successfully for item ${item._id}`);
           } else {
             console.log(
-              `No stock update occurred for item ${item.id}. Check if the ID exists.`
+              `No stock update occurred for item ${item._id}. Check if the ID exists.`
             );
           }
         }
@@ -342,7 +342,7 @@ app.post(
         subject: `New Offer for ${item.name}`,
         html: `
           <h3>New Offer Received</h3>
-          <p><strong>Item:</strong> ${item.name} (ID: ${item.id})</p>
+          <p><strong>Item:</strong> ${item.name} (ID: ${item._id})</p>
           <p><strong>Name:</strong> ${name}</p>
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Offer:</strong> $${offer}</p>

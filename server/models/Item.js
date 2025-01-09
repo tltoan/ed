@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const itemSchema = new mongoose.Schema({
-  id: String,
+  _id: String,
   name: String,
   images: [String],
   popupImages: [String],

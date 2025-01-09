@@ -32,7 +32,7 @@ const Showcase = () => {
   }, []);
 
   const handleAddToCart = (item) => {
-    if (cartItems.find((cartItem) => cartItem.id === item.id)) {
+    if (cartItems.find((cartItem) => cartItem._id === item._id)) {
       alert(`${item.name} is already in your cart.`);
       return;
     }
@@ -103,7 +103,7 @@ const Showcase = () => {
       <div className="showcase">
         {items.map((item) => (
           <div
-            key={item.id}
+            key={item._id}
             className={`para showcase-item ${item.stock === 0 ? "sold" : ""}`}
             onClick={() => handleItemClick(item)}
             onMouseEnter={(e) => handleMouseEnter(e, item.images)}

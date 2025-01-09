@@ -20,7 +20,7 @@ const seedDatabase = async () => {
     for (const item of items) {
       console.log("Seeding item:", item);
       await Item.updateOne(
-        { _id: item.id }, // Use _id instead of id
+        { _id: item._id }, // Use _id instead of id
         { $set: item },
         { upsert: true }
       );

@@ -1,6 +1,6 @@
 const items = [
   {
-    id: "BBJKT",
+    _id: "BBJKT",
     images: [
       "/clothes-img/baseball1.svg",
       "/clothes-img/baseball2.svg",
@@ -24,7 +24,7 @@ const items = [
     ],
   },
   {
-    id: "CWHOO",
+    _id: "CWHOO",
     images: [
       "/clothes-img/woolhoodie1.svg",
       "/clothes-img/woolhoodie2.svg",
@@ -48,7 +48,7 @@ const items = [
     ],
   },
   {
-    id: "GQZIP",
+    _id: "GQZIP",
     images: ["/clothes-img/greyqzip1.svg", "/clothes-img/greyqzip2.svg"],
     name: "Grey Quarter Zip",
     brand: "Banana Republic",
@@ -64,7 +64,7 @@ const items = [
     ],
   },
   {
-    id: "LEVDEM",
+    _id: "LEVDEM",
     images: [
       "./clothes-img/levidenimjacket1.svg",
       "./clothes-img/levisdenimjacket2.svg",
@@ -86,7 +86,7 @@ const items = [
     ],
   },
   {
-    id: "SIMJKT",
+    _id: "SIMJKT",
     images: [
       "/clothes-img/simpsonjacket-3.svg",
       "/clothes-img/simpsonjacket-2.svg",
@@ -110,7 +110,7 @@ const items = [
     ],
   },
   {
-    id: "GRARTE",
+    _id: "GRARTE",
     images: ["/clothes-img/xshirt1.svg", "/clothes-img/xshirt2.svg"],
     name: "Graphic T with X",
     brand: " Express ",
@@ -126,7 +126,7 @@ const items = [
     ],
   },
   {
-    id: "POLBTN",
+    _id: "POLBTN",
     images: ["./clothes-img/polubutton1.svg", "./clothes-img/polobutton2.svg"],
     name: "White Polo Button Up",
     brand: " Polo Ralph Lauren ",
@@ -145,7 +145,7 @@ const items = [
     ],
   },
   {
-    id: "STRZIP",
+    _id: "STRZIP",
     images: [
       "./clothes-img/strippedjacket1.svg",
       "./clothes-img/strippedjacket2.svg",
